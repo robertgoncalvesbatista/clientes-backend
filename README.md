@@ -6,16 +6,17 @@
 - [ ] Após cadastrar uma nova conta, enviar um e-mail de boas vindas.
 - [ ] Após realizar login, o usuário deve ter acesso à uma listagem de clientes, contendo paginação e algum filtro ou modo de pesquisa.
 - [ ] Deverá ser possível cadastrar um novo cliente, contendo os seguintes campos:
-- - Nome (obrigatório)
-- - CPF (obrigatório)
-- - Categoria
-- - CEP (obrigatório)
-- - Rua
-- - Bairro
-- - Cidade
-- - UF
-- - Complemento
-- - Telefone
+- Nome (Obrigatório)
+- CPF (Obrigatório)
+- Categoria
+- CEP (Obrigatório)
+- Rua
+- Bairro
+- Cidade
+- UF
+- Complemento
+- Telefone
+
 - [ ] No cadastro, quando o usuário preencher o campo de CEP, o sistema deve consultar na API ViaCEP (http://viacep.com.br) e preencher os demais campos automaticamente (rua, bairro, cidade e uf).
 - [ ] O campo de telefone deverá ter uma máscara para padronização do telefone(Exemplo: '(99) 9 9999-9999').
 - [ ] Deverá ser possível alterar e excluir clientes.
