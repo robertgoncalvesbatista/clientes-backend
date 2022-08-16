@@ -23,9 +23,9 @@
 
 ## Requisitos Não Funcionais
 
-- [ ] No backend, utilizar PHP e Laravel (versão 7 ou superior).
-- [ ] Usar Postgres como banco de dados.
-- [ ] Usar o Eloquent para acesso a banco de dados.
+- [x] No backend, utilizar PHP e Laravel (versão 7 ou superior).
+- [x] Usar Postgres como banco de dados.
+- [x] Usar o Eloquent para acesso a banco de dados.
 - [ ] Usar migrations para criação e alteração do banco de dados;
 - [ ] No frontend, usar tecnologia ou framework de sua preferência.
 - [ ] As validações devem ocorrer tanto no backend como no frontend.
