@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Http\Requests\StoreCustomerRequest;
-use App\Http\Requests\UpdateCustomerRequest;
+use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
@@ -15,72 +14,168 @@ class CustomerController extends Controller
      */
     public function index()
     {
-        //
-    }
+        $customers = Customer::all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return response($customers, 201);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \App\Http\Requests\StoreCustomerRequest  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreCustomerRequest $request)
+    public function create(Request $request)
     {
-        //
+        $fields = $request->validate([
+            "name" => "required|string",
+            "cpf" => "required|string",
+            "category" => "string",
+            "cep" => "required|string",
+            "rua" => "string",
+            "bairro" => "string",
+            "cidade" => "string",
+            "uf" => "string",
+            "complemento" => "string",
+            "telephone" => "string",
+        ]);
+
+        // Primeira parte da validação do CPF
+        $numbers = [];
+        for ($i=0, $j=10; $i < 9; $i++, $j--) { 
+            $digit = $fields["cpf"][$i];
+
+            array_push($numbers, $digit * $j);
+        }
+
+        $resultFirstVerification = (array_sum($numbers) * 10) % 11;
+
+        if($resultFirstVerification != $fields["cpf"][9]) {
+            return response([ "message" => "Este CPF não é válido!" ], 401);
+        }
+
+        // Segunda parte da validação do CPF
+        $numbers = [];
+        for ($i=0, $j=11; $i < 10; $i++, $j--) { 
+            $digit = $fields["cpf"][$i];
+
+            array_push($numbers, $digit * $j);
+        }
+
+        $resultSecondVerification = (array_sum($numbers) * 10) % 11;
+
+        if($resultSecondVerification != $fields["cpf"][10]) {
+            return response([ "message" => "Este CPF não é válido!" ], 401);
+        }
+
+        // Cadastrar o cliente
+        $customer = Customer::create([
+            "name" => $fields["name"],
+            "cpf" => $fields["cpf"],
+            "category" => $fields["category"],
+            "cep" => $fields["cep"],
+            "rua" => $fields["rua"],
+            "bairro" => $fields["bairro"],
+            "cidade" => $fields["cidade"],
+            "uf" => $fields["uf"],
+            "complemento" => $fields["complemento"],
+            "telephone" => $fields["telephone"],
+        ]);
+
+        return response($customer, 201);
     }
 
     /**
      * Display the specified resource.
-     *
-     * @param  \App\Models\Customer  $customer
+     * 
+     * @param  Number  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Customer $customer)
+    public function read($id)
     {
-        //
-    }
+        $customer = Customer::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Customer  $customer
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Customer $customer)
-    {
-        //
+        return response($customer, 201);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \App\Http\Requests\UpdateCustomerRequest  $request
-     * @param  \App\Models\Customer  $customer
+     * @param  \Request  $request
+     * @param  Number  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(UpdateCustomerRequest $request, Customer $customer)
+    public function update(Request $request, $id)
     {
-        //
+        $fields = $request->validate([
+            "name" => "required|string",
+            "cpf" => "required|string",
+            "category" => "string",
+            "cep" => "required|string",
+            "rua" => "string",
+            "bairro" => "string",
+            "cidade" => "string",
+            "uf" => "string",
+            "complemento" => "string",
+            "telephone" => "string",
+        ]);
+
+        // Primeira parte da validação do CPF
+        $numbers = [];
+        for ($i=0, $j=10; $i < 9; $i++, $j--) { 
+            $digit = $fields["cpf"][$i];
+
+            array_push($numbers, $digit * $j);
+        }
+
+        $resultFirstVerification = (array_sum($numbers) * 10) % 11;
+
+        if($resultFirstVerification != $fields["cpf"][9]) {
+            return response([ "message" => "Este CPF não é válido!" ], 401);
+        }
+
+        // Segunda parte da validação do CPF
+        $numbers = [];
+        for ($i=0, $j=11; $i < 10; $i++, $j--) { 
+            $digit = $fields["cpf"][$i];
+
+            array_push($numbers, $digit * $j);
+        }
+
+        $resultSecondVerification = (array_sum($numbers) * 10) % 11;
+
+        if($resultSecondVerification != $fields["cpf"][10]) {
+            return response([ "message" => "Este CPF não é válido!" ], 401);
+        }
+
+        $customer = Customer::find($id);
+
+        $customer->name = $fields["name"];
+        $customer->cpf = $fields["cpf"];
+        $customer->category = $fields["category"];
+        $customer->cep = $fields["cep"];
+        $customer->rua = $fields["rua"];
+        $customer->bairro = $fields["bairro"];
+        $customer->cidade = $fields["cidade"];
+        $customer->uf = $fields["uf"];
+        $customer->complemento = $fields["complemento"];
+        $customer->telephone = $fields["telephone"];
+
+        $customer->save();
+
+        return response($customer, 201);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Customer  $customer
+     * @param  Number  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Customer $customer)
+    public function destroy($id)
     {
-        //
+        $customer = Customer::destroy($id);
+
+        return response($customer, 201);
     }
 }

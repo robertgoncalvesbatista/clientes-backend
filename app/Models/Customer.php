@@ -19,7 +19,11 @@ class Customer extends Model
         'cpf',
         'category',
         'cep',
-        'address',
+        'rua',
+        'bairro',
+        'cidade',
+        'uf',
+        'complemento',
         'telephone',
     ];
 

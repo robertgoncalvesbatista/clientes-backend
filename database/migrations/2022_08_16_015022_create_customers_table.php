@@ -19,7 +19,11 @@ return new class extends Migration
             $table->string("cpf")->unique();
             $table->string("category")->nullable();
             $table->string("cep");
-            $table->json("address")->nullable();
+            $table->string("rua")->nullable();
+            $table->string("bairro")->nullable();
+            $table->string("cidade")->nullable();
+            $table->string("uf")->nullable();
+            $table->string("complemento")->nullable();
             $table->string("telephone")->nullable();
             $table->timestamps();
         });

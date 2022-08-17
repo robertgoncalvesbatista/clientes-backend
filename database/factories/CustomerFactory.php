@@ -4,6 +4,9 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+use Faker\Provider\pt_BR\Person;
+use Faker\Factory as FakerFactory;
+
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
  */
@@ -16,13 +19,13 @@ class CustomerFactory extends Factory
      */
     public function definition()
     {
+        $faker = FakerFactory::create();
+        $fakerBR = new Person($faker);
+
         return [
-            'name' => fake()->name(),
-            'cpf' => fake()->safeEmail(),
-            'category' => fake()->name(),
-            'cep' => fake()->name(),
-            'address' => fake()->name(),
-            'telephone' => fake()->name(),
+            'name' => $fakerBR->name(),
+            'cpf' => $fakerBR->cpf(),
+            'cep' => "28024-140",
         ];
     }
 }
