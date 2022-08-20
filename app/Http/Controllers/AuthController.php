@@ -8,8 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 
-use App\Mail\SendMailRegister;
-
 class AuthController extends Controller
 {
     /**
@@ -39,6 +37,9 @@ class AuthController extends Controller
         });
 
         $token = $user->createToken("appToken")->plainTextToken;
+
+        $user->remember_token = $token;
+        $user->save();
 
         $response = [
             "user" => $user,
@@ -76,8 +77,12 @@ class AuthController extends Controller
         // Gera um token e guarda na variável $token
         $token = $user->createToken("appToken")->plainTextToken;
 
+        $user->remember_token = $token;
+        $user->save();
+
         // Guarda a resposta que será enviada em caso de sucesso
         $response = [
+
             "user" => $user,
             "token" => $token,
         ];
@@ -92,15 +97,6 @@ class AuthController extends Controller
 
         return [
             "message" => "Logged out"
-        ];
-    }
-
-    public function validateToken(Request $request)
-    {
-        $response = $request->user()->tokens();
-
-        return [
-            "token" => $response
         ];
     }
 }
