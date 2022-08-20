@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Customer extends Model
+class Address extends Model
 {
     use HasFactory;
 
@@ -15,15 +15,12 @@ class Customer extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'cpf',
-        'category',
-        'address',
-        'telephone',
+        'rua',
+        'bairro',
+        'cidade',
+        'uf',
+        'cep',
+        'complemento',
+        'id_customer',
     ];
-
-    public function address()
-    {
-        return $this->hasOne(Address::class, "id_customer");
-    }
 }

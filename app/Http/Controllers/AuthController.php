@@ -6,6 +6,9 @@ use App\Models\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+
+use App\Mail\SendMailRegister;
 
 class AuthController extends Controller
 {
@@ -28,6 +31,12 @@ class AuthController extends Controller
             "email" => $fields["email"],
             "password" => bcrypt($fields["password"]),
         ]);
+
+        Mail::send("emails.test", ['user' => $user], function ($m) use ($user) {
+            $m->from("robert.comunicar@gmail.com", "Robert");
+
+            $m->to($user->email, $user->name)->subject('Your Reminder!');
+        });
 
         $token = $user->createToken("appToken")->plainTextToken;
 
@@ -61,7 +70,7 @@ class AuthController extends Controller
         // A senha passa por um hash para ser conferida com a hash no banco de dados
         // Se tudo der certo continua, senão retorna um json com "message" => "Bad creds"
         if (!$user || !Hash::check($fields["password"], $user->password)) {
-            return response([ "message" => "Bad creds" ], 401);
+            return response(["message" => "Bad creds"], 401);
         };
 
         // Gera um token e guarda na variável $token
@@ -77,11 +86,21 @@ class AuthController extends Controller
         return response($response, 201);
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         $request->user()->tokens()->delete();
 
         return [
             "message" => "Logged out"
+        ];
+    }
+
+    public function validateToken(Request $request)
+    {
+        $response = $request->user()->tokens();
+
+        return [
+            "token" => $response
         ];
     }
 }

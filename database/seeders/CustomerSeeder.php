@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Customer;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CustomerSeeder extends Seeder
@@ -16,7 +15,7 @@ class CustomerSeeder extends Seeder
     public function run()
     {
         Customer::factory()
-            ->count(10)
+            ->count(1)
             ->create();
     }
 }

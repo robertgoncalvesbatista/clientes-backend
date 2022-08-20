@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Address;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 
@@ -15,8 +16,14 @@ class CustomerController extends Controller
     public function index()
     {
         $customers = Customer::all();
+        $data = array();
 
-        return response($customers, 201);
+        foreach ($customers as $customer) {
+            $address = Customer::with("address")->findOrFail($customer->id);
+            array_push($data, $address);
+        }
+
+        return response($data, 201);
     }
 
     /**
@@ -42,7 +49,7 @@ class CustomerController extends Controller
 
         // Primeira parte da validação do CPF
         $numbers = [];
-        for ($i=0, $j=10; $i < 9; $i++, $j--) { 
+        for ($i = 0, $j = 10; $i < 9; $i++, $j--) {
             $digit = $fields["cpf"][$i];
 
             array_push($numbers, $digit * $j);
@@ -50,13 +57,13 @@ class CustomerController extends Controller
 
         $resultFirstVerification = (array_sum($numbers) * 10) % 11;
 
-        if($resultFirstVerification != $fields["cpf"][9]) {
-            return response([ "message" => "Este CPF não é válido!" ], 401);
+        if ($resultFirstVerification != $fields["cpf"][9]) {
+            return response(["message" => "Este CPF não é válido!"], 401);
         }
 
         // Segunda parte da validação do CPF
         $numbers = [];
-        for ($i=0, $j=11; $i < 10; $i++, $j--) { 
+        for ($i = 0, $j = 11; $i < 10; $i++, $j--) {
             $digit = $fields["cpf"][$i];
 
             array_push($numbers, $digit * $j);
@@ -64,22 +71,27 @@ class CustomerController extends Controller
 
         $resultSecondVerification = (array_sum($numbers) * 10) % 11;
 
-        if($resultSecondVerification != $fields["cpf"][10]) {
-            return response([ "message" => "Este CPF não é válido!" ], 401);
+        if ($resultSecondVerification != $fields["cpf"][10]) {
+            return response(["message" => "Este CPF não é válido!"], 401);
         }
 
-        // Cadastrar o cliente
+        // Cria o cliente
         $customer = Customer::create([
             "name" => $fields["name"],
             "cpf" => $fields["cpf"],
             "category" => $fields["category"],
+            "telephone" => $fields["telephone"],
+        ]);
+
+        // Cria o endereço do cliente
+        Address::create([
             "cep" => $fields["cep"],
             "rua" => $fields["rua"],
             "bairro" => $fields["bairro"],
             "cidade" => $fields["cidade"],
             "uf" => $fields["uf"],
             "complemento" => $fields["complemento"],
-            "telephone" => $fields["telephone"],
+            "id_customer" => $customer->id,
         ]);
 
         return response($customer, 201);
@@ -93,9 +105,13 @@ class CustomerController extends Controller
      */
     public function read($id)
     {
+        // Busca o cliente pelo seu ID
         $customer = Customer::find($id);
 
-        return response($customer, 201);
+        // Guarda os dados do cliente com o endereço
+        $response = Customer::with("address")->findOrFail($customer->id);
+
+        return response($response, 201);
     }
 
     /**
@@ -122,7 +138,7 @@ class CustomerController extends Controller
 
         // Primeira parte da validação do CPF
         $numbers = [];
-        for ($i=0, $j=10; $i < 9; $i++, $j--) { 
+        for ($i = 0, $j = 10; $i < 9; $i++, $j--) {
             $digit = $fields["cpf"][$i];
 
             array_push($numbers, $digit * $j);
@@ -130,13 +146,13 @@ class CustomerController extends Controller
 
         $resultFirstVerification = (array_sum($numbers) * 10) % 11;
 
-        if($resultFirstVerification != $fields["cpf"][9]) {
-            return response([ "message" => "Este CPF não é válido!" ], 401);
+        if ($resultFirstVerification != $fields["cpf"][9]) {
+            return response(["message" => "Este CPF não é válido!"], 401);
         }
 
         // Segunda parte da validação do CPF
         $numbers = [];
-        for ($i=0, $j=11; $i < 10; $i++, $j--) { 
+        for ($i = 0, $j = 11; $i < 10; $i++, $j--) {
             $digit = $fields["cpf"][$i];
 
             array_push($numbers, $digit * $j);
@@ -144,8 +160,8 @@ class CustomerController extends Controller
 
         $resultSecondVerification = (array_sum($numbers) * 10) % 11;
 
-        if($resultSecondVerification != $fields["cpf"][10]) {
-            return response([ "message" => "Este CPF não é válido!" ], 401);
+        if ($resultSecondVerification != $fields["cpf"][10]) {
+            return response(["message" => "Este CPF não é válido!"], 401);
         }
 
         $customer = Customer::find($id);

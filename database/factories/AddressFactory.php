@@ -4,13 +4,10 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-use Faker\Provider\pt_BR\Person;
-use Faker\Factory as FakerFactory;
-
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
  */
-class CustomerFactory extends Factory
+class AddressFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -19,14 +16,14 @@ class CustomerFactory extends Factory
      */
     public function definition()
     {
-        $faker = FakerFactory::create();
-        $fakerBR = new Person($faker);
-
         return [
-            'name' => $fakerBR->name(),
-            'cpf' => $fakerBR->cpf(),
-            'category' => "Profissional",
-            'telephone' => "(22) 99936-3638",
+            'rua' => "Rua Domingos Viana",
+            'bairro' => "Turf Club",
+            'cidade' => "Campos dos Goytacazes",
+            'uf' => "RJ",
+            'cep' => "28024-140",
+            'complemento' => "Escritório",
+            'id_customer' => "1",
         ];
     }
 }

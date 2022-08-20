@@ -1,9 +1,9 @@
-# Backend - Processo Seletivo
+# Processo Seletivo - eGET
 
 ## Requisitos Funcionais
 
 -   [x] Deverá ser possível que o usuário faça login na aplicação e, caso não possua conta, realize um novo cadastro.
--   [ ] Após cadastrar uma nova conta, enviar um e-mail de boas vindas.
+-   [x] Após cadastrar uma nova conta, enviar um e-mail de boas vindas.
 -   [ ] Após realizar login, o usuário deve ter acesso à uma listagem de clientes, contendo paginação e algum filtro ou modo de pesquisa.
 -   [ ] Deverá ser possível cadastrar um novo cliente, contendo os seguintes campos:
 -   Nome (Obrigatório);
@@ -34,7 +34,7 @@
 
 ## Regras de Negócio
 
--   [ ] O sistema não deve permitir o cadastro de um CPF inválido.
+-   [x] O sistema não deve permitir o cadastro de um CPF inválido.
 -   [x] O sistema não deve permitir o cadastro de um CPF duplicado.
 -   [ ] Um usuário não pode visualizar ou ter acesso aos clientes de outro usuário.
 
