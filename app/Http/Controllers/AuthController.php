@@ -82,7 +82,6 @@ class AuthController extends Controller
 
         // Guarda a resposta que será enviada em caso de sucesso
         $response = [
-
             "user" => $user,
             "token" => $token,
         ];

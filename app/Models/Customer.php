@@ -18,7 +18,6 @@ class Customer extends Model
         'name',
         'cpf',
         'category',
-        'address',
         'telephone',
     ];
 

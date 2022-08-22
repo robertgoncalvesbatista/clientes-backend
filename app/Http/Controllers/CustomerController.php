@@ -4,11 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Address;
 use App\Models\Customer;
-use App\Models\User;
-use App\Models\UserCustomer;
 use Illuminate\Http\Request;
-
-use Illuminate\Database\Eloquent\Builder;
 
 class CustomerController extends Controller
 {
@@ -50,6 +46,8 @@ class CustomerController extends Controller
             "complemento" => "string",
             "telephone" => "string",
         ]);
+
+        $fields["cpf"] = str_replace(["-", "."], "", $fields["cpf"]);
 
         // Primeira parte da validação do CPF
         $numbers = [];
@@ -220,7 +218,7 @@ class CustomerController extends Controller
     // Busca os clientes que pertencem ao usuário logado
     public function userCustomers(Request $request)
     {
-        $customers = $request->user()->customers;
+        $customers = $request->user()->customers->load("address");
 
         return response($customers, 201);
     }
