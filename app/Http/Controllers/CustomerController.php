@@ -9,15 +9,15 @@ use Illuminate\Http\Request;
 class CustomerController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Busca pelos dados de todos os clientes no banco de dados
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
         $customers = Customer::all();
-        $data = array();
 
+        $data = array();
         foreach ($customers as $customer) {
             $address = Customer::with("address")->findOrFail($customer->id);
             array_push($data, $address);
@@ -27,7 +27,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Cria e guarda um novo cliente no banco de dados
      *
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
@@ -46,6 +46,8 @@ class CustomerController extends Controller
             "complemento" => "string",
             "telephone" => "string",
         ]);
+
+        $fields["cpf"] = str_replace(["-", "."], "", $fields["cpf"]);
 
         // Primeira parte da validação do CPF
         $numbers = [];
@@ -94,11 +96,18 @@ class CustomerController extends Controller
             "id_customer" => $customer->id,
         ]);
 
-        return response($customer, 201);
+        // Relaciona o cliente ao usuário autenticado
+        $user = $request->user();
+        $user->customers()->attach($customer);
+
+        // Busca os dados do cliente com o endereço relacionado
+        $response = Customer::with("address")->findOrFail($customer->id);
+
+        return response($response, 201);
     }
 
     /**
-     * Display the specified resource.
+     * Busca pelos dados de um cliente
      * 
      * @param  Number  $id
      * @return \Illuminate\Http\Response
@@ -115,7 +124,7 @@ class CustomerController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza os dados de um cliente
      *
      * @param  \Request  $request
      * @param  Number  $id
@@ -164,26 +173,37 @@ class CustomerController extends Controller
             return response(["message" => "Este CPF não é válido!"], 401);
         }
 
+        // Edita e salva os dados do cliente
         $customer = Customer::find($id);
 
         $customer->name = $fields["name"];
         $customer->cpf = $fields["cpf"];
         $customer->category = $fields["category"];
-        $customer->cep = $fields["cep"];
-        $customer->rua = $fields["rua"];
-        $customer->bairro = $fields["bairro"];
-        $customer->cidade = $fields["cidade"];
-        $customer->uf = $fields["uf"];
-        $customer->complemento = $fields["complemento"];
         $customer->telephone = $fields["telephone"];
 
         $customer->save();
 
-        return response($customer, 201);
+        // Edita e salva os dados do endereço do cliente
+        $address = Address::where("id_customer", $id)->get();
+
+        $address->toQuery()->update([
+            'cep' => $fields["cep"],
+            'rua' => $fields["rua"],
+            'bairro' => $fields["bairro"],
+            'cidade' => $fields["cidade"],
+            'uf' => $fields["uf"],
+            'complemento' => $fields["complemento"],
+        ]);
+
+        // Busca pelos dados do cliente com os dados do endereço relacionado
+        $response = Customer::with("address")->findOrFail($customer->id);
+
+        // Retornar dados
+        return response($response, 201);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove o cliente do banco de dados
      *
      * @param  Number  $id
      * @return \Illuminate\Http\Response
@@ -193,5 +213,13 @@ class CustomerController extends Controller
         $customer = Customer::destroy($id);
 
         return response($customer, 201);
+    }
+
+    // Busca os clientes que pertencem ao usuário logado
+    public function userCustomers(Request $request)
+    {
+        $customers = $request->user()->customers->load("address");
+
+        return response($customers, 201);
     }
 }

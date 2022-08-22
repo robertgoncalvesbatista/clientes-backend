@@ -33,7 +33,19 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $fields = $request->validate([
+            "name" => "required|string",
+            "email" => "required|string|unique:users,email",
+            "password" => "required|string|confirmed",
+        ]);
+
+        $user = User::create([
+            "name" => $fields["name"],
+            "email" => $fields["email"],
+            "password" => bcrypt($fields["password"]),
+        ]);
+
+        return response($user, 201);
     }
 
     /**
@@ -42,9 +54,15 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function read($id)
     {
-        //
+        // Busca o cliente pelo seu ID
+        $user = User::find($id);
+
+        // Guarda os dados do cliente com o endereço
+        $response = User::with("customers")->findOrFail($user->id);
+
+        return response($response, 201);
     }
 
     /**
@@ -56,7 +74,21 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $fields = $request->validate([
+            "name" => "required|string",
+            "email" => "required|string",
+            "password" => "required|string|confirmed",
+        ]);
+
+        $user = User::find($id);
+
+        $user->name = $fields["name"];
+        $user->email = $fields["email"];
+        $user->password = $fields["password"];
+
+        $user->save();
+
+        return response($user, 201);
     }
 
     /**
@@ -67,6 +99,8 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $user = User::destroy($id);
+
+        return response($user, 201);
     }
 }

@@ -26,8 +26,7 @@ Route::post("/register", [AuthController::class, "register"]);
 Route::post("/authenticate", [AuthController::class, "login"]);
 
 Route::group(["middleware" => ["auth:sanctum"]], function () {
-    Route::post("/logout", [AuthController::class, "logout"]);
-    Route::post("/validate/token", [AuthController::class, "validateToken"]);
+    Route::get("/logout", [AuthController::class, "logout"]);
 
     // Rotas do cliente
     Route::get("/customers/all", [CustomerController::class, "index"]);
@@ -41,4 +40,6 @@ Route::group(["middleware" => ["auth:sanctum"]], function () {
     Route::get("/users/read/{id}", [UserController::class, "read"]);
     Route::put("/users/update/{id}", [UserController::class, "update"]);
     Route::delete("/users/destroy/{id}", [UserController::class, "destroy"]);
+
+    Route::get("/users/customers", [CustomerController::class, "userCustomers"]);
 });
