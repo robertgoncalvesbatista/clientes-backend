@@ -145,6 +145,8 @@ class CustomerController extends Controller
             "telephone" => "string",
         ]);
 
+        $fields["cpf"] = str_replace(["-", "."], "", $fields["cpf"]);
+
         // Primeira parte da validação do CPF
         $numbers = [];
         for ($i = 0, $j = 10; $i < 9; $i++, $j--) {
@@ -219,6 +221,14 @@ class CustomerController extends Controller
     public function userCustomers(Request $request)
     {
         $customers = $request->user()->customers->load("address");
+
+        return response($customers, 201);
+    }
+
+    // Busca os clientes que pertencem ao usuário logado
+    public function searchCustomer(Request $request)
+    {
+        $customers = Customer::where("name", "like", $request->search)->with("address");
 
         return response($customers, 201);
     }
