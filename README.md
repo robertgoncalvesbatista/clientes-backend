@@ -3,7 +3,7 @@
 ## Requisitos Funcionais
 
 -   [x] Deverá ser possível que o usuário faça login na aplicação e, caso não possua conta, realize um novo cadastro.
--   [x] Após cadastrar uma nova conta, enviar um e-mail de boas vindas.
+-   [x] Após cadastrar uma nova conta, enviar um e-mail de boas vindas. (Feito com sendinblue)
 -   [ ] Após realizar login, o usuário deve ter acesso à uma listagem de clientes, contendo paginação e algum filtro ou modo de pesquisa.
 -   [x] Deverá ser possível cadastrar um novo cliente, contendo os seguintes campos:
 -   -   Nome (Obrigatório);

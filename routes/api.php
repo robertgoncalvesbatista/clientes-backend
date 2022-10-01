@@ -28,18 +28,20 @@ Route::post("/authenticate", [AuthController::class, "login"]);
 Route::group(["middleware" => ["auth:sanctum"]], function () {
     Route::get("/logout", [AuthController::class, "logout"]);
 
-    // Rotas do cliente
-    Route::get("/customers/all", [CustomerController::class, "index"]);
-    Route::post("/customers/create", [CustomerController::class, "create"]);
-    Route::get("/customers/read/{id}", [CustomerController::class, "read"]);
-    Route::put("/customers/update/{id}", [CustomerController::class, "update"]);
-    Route::delete("/customers/destroy/{id}", [CustomerController::class, "destroy"]);
+    Route::apiResource("customer", CustomerController::class)->parameters(["customer" => "customer"]);
+    Route::apiResource("user", UserController::class)->parameters(["user" => "user"]);
 
-    Route::get("/users/all", [UserController::class, "index"]);
-    Route::post("/users/create", [UserController::class, "create"]);
-    Route::get("/users/read/{id}", [UserController::class, "read"]);
-    Route::put("/users/update/{id}", [UserController::class, "update"]);
-    Route::delete("/users/destroy/{id}", [UserController::class, "destroy"]);
+    // Route::get("/customers/all", [CustomerController::class, "index"]);
+    // Route::post("/customers/create", [CustomerController::class, "create"]);
+    // Route::get("/customers/read/{id}", [CustomerController::class, "read"]);
+    // Route::put("/customers/update/{id}", [CustomerController::class, "update"]);
+    // Route::delete("/customers/destroy/{id}", [CustomerController::class, "destroy"]);
+
+    // Route::get("/users/all", [UserController::class, "index"]);
+    // Route::post("/users/create", [UserController::class, "create"]);
+    // Route::get("/users/read/{id}", [UserController::class, "read"]);
+    // Route::put("/users/update/{id}", [UserController::class, "update"]);
+    // Route::delete("/users/destroy/{id}", [UserController::class, "destroy"]);
 
     Route::get("/users/customers", [CustomerController::class, "userCustomers"]);
 });
