@@ -13,6 +13,20 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable;
 
     /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -44,6 +58,6 @@ class User extends Authenticatable
 
     public function customers()
     {
-        return $this->belongsToMany(Customer::class, "user_customers", "id_user", "id_customer");
+        return $this->belongsToMany(Customer::class, "user_customers", "user_id", "customer_id");
     }
 }

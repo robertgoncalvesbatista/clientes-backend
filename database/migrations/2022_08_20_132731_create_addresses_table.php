@@ -15,18 +15,13 @@ return new class extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->string("rua");
-            $table->string("bairro");
-            $table->string("cidade");
-            $table->string("uf");
-            $table->string("cep");
-            $table->string("complemento");
-            $table->unsignedBigInteger("id_customer");
+            $table->string('rua');
+            $table->string('bairro');
+            $table->string('cidade');
+            $table->string('uf');
+            $table->string('cep', 8);
+            $table->string('complemento');
             $table->timestamps();
-        });
-
-        Schema::table("addresses", function (Blueprint $table) {
-            $table->foreign("id_customer")->references("id")->on("customers")->onDelete("cascade");
         });
     }
 

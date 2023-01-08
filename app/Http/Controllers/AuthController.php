@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserStoreRequest;
 use App\Models\User;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -13,46 +13,48 @@ class AuthController extends Controller
     /**
      * Registra um novo usuário via HTTP
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \App\Http\Requests\AuthRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function register(Request $request)
+    public function register(UserStoreRequest $request)
     {
-        $fields = $request->validate([
-            "name" => "required|string",
-            "email" => "required|string|unique:users,email",
-            "password" => "required|string|confirmed",
-        ]);
+        // Tem que utilizar o form request
 
-        $user = User::create([
-            "name" => $fields["name"],
-            "email" => $fields["email"],
-            "password" => bcrypt($fields["password"]),
-        ]);
+        try {
+            $validated = $request->validated();
 
-        Mail::send("emails.test", ['user' => $user], function ($m) use ($user) {
-            $m->from("robert.comunicar@gmail.com", "Robert");
+            $validated['password'] = bcrypt($validated['password']);
 
-            $m->to($user->email, $user->name)->subject('Your Reminder!');
-        });
+            $user = User::create($validated);
 
-        $token = $user->createToken("appToken")->plainTextToken;
+            return ['message' => $user];
+        } catch (\Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
+        }
 
-        $user->remember_token = $token;
-        $user->save();
+        // // Mail::send("emails.test", ['user' => $user], function ($m) use ($user) {
+        // //     $m->from("robert.comunicar@gmail.com", "Robert");
 
-        $response = [
-            "user" => $user,
-            "token" => $token,
-        ];
+        // //     $m->to($user->email, $user->name)->subject('Your Reminder!');
+        // // });
 
-        return response($response, 201);
+        // $token = $user->createToken("appToken")->plainTextToken;
+
+        // $user->remember_token = $token;
+        // $user->save();
+
+        // $response = [
+        //     "user" => $user,
+        //     "token" => $token,
+        // ];
+
+        // return response($response, 201);
     }
 
     /**
      * Realiza o login do usuário via HTTP
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
@@ -60,30 +62,30 @@ class AuthController extends Controller
         // Valida para que os campos sejam strings obrigatórias
         // Caso não atinja um dos requisitos, não continua
         $fields = $request->validate([
-            "email" => "required|string",
-            "password" => "required|string",
+            'email' => 'required|string',
+            'password' => 'required|string',
         ]);
 
         // Pesquisa pelo email do usuário e guarda o resultado na variável $user
-        $user = User::where("email", $fields["email"])->first();
+        $user = User::where('email', $fields['email'])->first();
 
         // Valida se a variável $user guardou algo e se as senhas batem
         // A senha passa por um hash para ser conferida com a hash no banco de dados
         // Se tudo der certo continua, senão retorna um json com "message" => "Bad creds"
-        if (!$user || !Hash::check($fields["password"], $user->password)) {
-            return response(["message" => "Bad creds"], 401);
-        };
+        if (! $user || ! Hash::check($fields['password'], $user->password)) {
+            return response(['message' => 'Bad creds'], 401);
+        }
 
         // Gera um token e guarda na variável $token
-        $token = $user->createToken("appToken")->plainTextToken;
+        $token = $user->createToken('appToken')->plainTextToken;
 
         $user->remember_token = $token;
         $user->save();
 
         // Guarda a resposta que será enviada em caso de sucesso
         $response = [
-            "user" => $user,
-            "token" => $token,
+            'user' => $user,
+            'token' => $token,
         ];
 
         // Envia a resposta pelo HTTP
@@ -94,8 +96,6 @@ class AuthController extends Controller
     {
         $request->user()->tokens()->delete();
 
-        return [
-            "message" => "Logged out"
-        ];
+        return response(['message' => 'Logged out'], 200);
     }
 }

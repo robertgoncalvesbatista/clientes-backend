@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Support\Facades\Log;
+use PDOException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -44,7 +47,20 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->reportable(function (Throwable $e) {
-            //
+            Log::error($e->getMessage());
+            abort($e->getCode(), $e->getMessage());
+        });
+
+        // Para erros de SQL
+        $this->reportable(function (PDOException $e) {
+            Log::error($e->getMessage());
+            abort($e->getCode(), $e->getMessage());
+        });
+
+        // Para exceptions
+        $this->reportable(function (Exception $e) {
+            Log::error($e->getMessage());
+            abort($e->getCode(), $e->getMessage());
         });
     }
 }

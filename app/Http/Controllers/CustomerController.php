@@ -2,223 +2,129 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Address;
-use App\Models\Customer;
+use App\Http\Requests\CustomerStoreRequest;
+use App\Http\Requests\CustomerUpdateRequest;
+use App\Http\Resources\CustomerCollection;
+use App\Http\Resources\CustomerResource;
+use App\Repositories\Contracts\CustomerRepositoryInterface;
+use Exception;
 use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
+    protected $customer;
+
+    /**
+     * Create the controller instance
+     *
+     * @param CustomerRepositoryInterface $customer
+     */
+    public function __construct(CustomerRepositoryInterface $customer)
+    {
+        $this->customer = $customer;
+    }
+
     /**
      * Busca pelos dados de todos os clientes no banco de dados
      *
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\CustomerCollection
      */
-    public function index(Request $request)
+    public function index()
     {
-        $customers = Customer::all();
+        try {
+            $data = $this->customer->getAll();
 
-        $data = array();
-        foreach ($customers as $customer) {
-            $address = Customer::with("address")->findOrFail($customer->id);
-            array_push($data, $address);
+            return new CustomerCollection($data);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
         }
-
-        return response($data, 201);
     }
 
     /**
      * Cria e guarda um novo cliente no banco de dados
      *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\CustomerStoreRequest  $request
+     * @return \App\Http\Resources\CustomerResource
      */
-    public function create(Request $request)
+    public function store(CustomerStoreRequest $request)
     {
-        $fields = $request->validate([
-            "name" => "required|string",
-            "cpf" => "required|string",
-            "category" => "string",
-            "cep" => "required|string",
-            "rua" => "string",
-            "bairro" => "string",
-            "cidade" => "string",
-            "uf" => "string",
-            "complemento" => "string",
-            "telephone" => "string",
-        ]);
+        try {
+            $validated = $request->validated();
 
-        $fields["cpf"] = str_replace(["-", "."], "", $fields["cpf"]);
+            $response = $this->customer->create($validated);
 
-        // Primeira parte da validação do CPF
-        $numbers = [];
-        for ($i = 0, $j = 10; $i < 9; $i++, $j--) {
-            $digit = $fields["cpf"][$i];
-
-            array_push($numbers, $digit * $j);
+            return new CustomerResource($response);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
         }
-
-        $resultFirstVerification = (array_sum($numbers) * 10) % 11;
-
-        if ($resultFirstVerification != $fields["cpf"][9]) {
-            return response(["message" => "Este CPF não é válido!"], 401);
-        }
-
-        // Segunda parte da validação do CPF
-        $numbers = [];
-        for ($i = 0, $j = 11; $i < 10; $i++, $j--) {
-            $digit = $fields["cpf"][$i];
-
-            array_push($numbers, $digit * $j);
-        }
-
-        $resultSecondVerification = (array_sum($numbers) * 10) % 11;
-
-        if ($resultSecondVerification != $fields["cpf"][10]) {
-            return response(["message" => "Este CPF não é válido!"], 401);
-        }
-
-        // Cria o cliente
-        $customer = Customer::create([
-            "name" => $fields["name"],
-            "cpf" => $fields["cpf"],
-            "category" => $fields["category"],
-            "telephone" => $fields["telephone"],
-        ]);
-
-        // Cria o endereço do cliente
-        Address::create([
-            "cep" => $fields["cep"],
-            "rua" => $fields["rua"],
-            "bairro" => $fields["bairro"],
-            "cidade" => $fields["cidade"],
-            "uf" => $fields["uf"],
-            "complemento" => $fields["complemento"],
-            "id_customer" => $customer->id,
-        ]);
-
-        // Relaciona o cliente ao usuário autenticado
-        $user = $request->user();
-        $user->customers()->attach($customer);
-
-        // Busca os dados do cliente com o endereço relacionado
-        $response = Customer::with("address")->findOrFail($customer->id);
-
-        return response($response, 201);
     }
 
     /**
      * Busca pelos dados de um cliente
-     * 
-     * @param  Number  $id
-     * @return \Illuminate\Http\Response
+     *
+     * @param  int $id
+     * @return \App\Http\Resources\CustomerResource
      */
-    public function read($id)
+    public function show(int $id)
     {
-        // Busca o cliente pelo seu ID
-        $customer = Customer::find($id);
+        try {
+            $response = $this->customer->findById($id);
 
-        // Guarda os dados do cliente com o endereço
-        $response = Customer::with("address")->findOrFail($customer->id);
-
-        return response($response, 201);
+            return new CustomerResource($response);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
+        }
     }
 
     /**
      * Atualiza os dados de um cliente
      *
-     * @param  \Request  $request
-     * @param  Number  $id
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\CustomerUpdateRequest  $request
+     * @param  int  $id
+     * @return \App\Http\Resources\CustomerResource
      */
-    public function update(Request $request, $id)
+    public function update(CustomerUpdateRequest $request, int $id)
     {
-        $fields = $request->validate([
-            "name" => "required|string",
-            "cpf" => "required|string",
-            "category" => "string",
-            "cep" => "required|string",
-            "rua" => "string",
-            "bairro" => "string",
-            "cidade" => "string",
-            "uf" => "string",
-            "complemento" => "string",
-            "telephone" => "string",
-        ]);
+        try {
+            $validated = $request->validated();
 
-        // Primeira parte da validação do CPF
-        $numbers = [];
-        for ($i = 0, $j = 10; $i < 9; $i++, $j--) {
-            $digit = $fields["cpf"][$i];
+            $response = $this->customer->edit($validated, $id);
 
-            array_push($numbers, $digit * $j);
+            return new CustomerResource($response);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
         }
-
-        $resultFirstVerification = (array_sum($numbers) * 10) % 11;
-
-        if ($resultFirstVerification != $fields["cpf"][9]) {
-            return response(["message" => "Este CPF não é válido!"], 401);
-        }
-
-        // Segunda parte da validação do CPF
-        $numbers = [];
-        for ($i = 0, $j = 11; $i < 10; $i++, $j--) {
-            $digit = $fields["cpf"][$i];
-
-            array_push($numbers, $digit * $j);
-        }
-
-        $resultSecondVerification = (array_sum($numbers) * 10) % 11;
-
-        if ($resultSecondVerification != $fields["cpf"][10]) {
-            return response(["message" => "Este CPF não é válido!"], 401);
-        }
-
-        // Edita e salva os dados do cliente
-        $customer = Customer::find($id);
-
-        $customer->name = $fields["name"];
-        $customer->cpf = $fields["cpf"];
-        $customer->category = $fields["category"];
-        $customer->telephone = $fields["telephone"];
-
-        $customer->save();
-
-        // Edita e salva os dados do endereço do cliente
-        $address = Address::where("id_customer", $id)->get();
-
-        $address->toQuery()->update([
-            'cep' => $fields["cep"],
-            'rua' => $fields["rua"],
-            'bairro' => $fields["bairro"],
-            'cidade' => $fields["cidade"],
-            'uf' => $fields["uf"],
-            'complemento' => $fields["complemento"],
-        ]);
-
-        // Busca pelos dados do cliente com os dados do endereço relacionado
-        $response = Customer::with("address")->findOrFail($customer->id);
-
-        // Retornar dados
-        return response($response, 201);
     }
 
     /**
      * Remove o cliente do banco de dados
      *
-     * @param  Number  $id
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        $customer = Customer::destroy($id);
+        try {
+            $this->customer->delete($id);
 
-        return response($customer, 201);
+            return response()->json(['message' => 'Registro removido com sucesso'], 200);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
+        }
     }
 
     // Busca os clientes que pertencem ao usuário logado
     public function userCustomers(Request $request)
     {
-        $customers = $request->user()->customers->load("address");
+        $customers = $request->user()->customers->load('address');
+
+        return response($customers, 201);
+    }
+
+    // Busca os clientes que pertencem ao usuário logado
+    public function searchCustomer(Request $request)
+    {
+        $customers = Customer::where("name", "like", $request->search)->with("address");
 
         return response($customers, 201);
     }

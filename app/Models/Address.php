@@ -10,6 +10,20 @@ class Address extends Model
     use HasFactory;
 
     /**
+     * The primary key associated with the table.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'addresses';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>
@@ -21,6 +35,5 @@ class Address extends Model
         'uf',
         'cep',
         'complemento',
-        'id_customer',
     ];
 }

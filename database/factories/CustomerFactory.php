@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-
-use Faker\Provider\pt_BR\Person;
+use App\Models\Address;
 use Faker\Factory as FakerFactory;
+use Faker\Provider\pt_BR\Person;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Customer>
@@ -24,9 +24,10 @@ class CustomerFactory extends Factory
 
         return [
             'name' => $fakerBR->name(),
-            'cpf' => $fakerBR->cpf(),
-            'category' => "Profissional",
-            'telephone' => "(22) 99936-3638",
+            'cpf' => $fakerBR->cpf(false),
+            'category' => 'Profissional',
+            'telephone' => '5522999363638',
+            'address_id' => Address::factory(),
         ];
     }
 }
