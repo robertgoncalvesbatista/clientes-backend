@@ -24,10 +24,17 @@ class CustomerStoreRequest extends FormRequest
     public function rules()
     {
         return [
-            "name"          => ["required", "string", "max:255"],
-            "cpf"           => ["required", "string", "max:255"],
-            "category"      => ["required", "string", "max:255"],
-            "telephone"     => ["required", "string", "max:255"],
+            'name' => ['required', 'string', 'max:255'],
+            'cpf' => ['required', 'string', 'max:11', 'unique:customers,cpf'],
+            'category' => ['required', 'string', 'max:255'],
+            'telephone' => ['required', 'string', 'max:13'],
+
+            'cep' => ['required', 'string', 'max:8'],
+            'rua' => ['required', 'string', 'max:255'],
+            'bairro' => ['required', 'string', 'max:255'],
+            'cidade' => ['required', 'string', 'max:255'],
+            'uf' => ['required', 'string', 'max:255'],
+            'complemento' => ['required', 'string', 'max:255'],
         ];
     }
 }

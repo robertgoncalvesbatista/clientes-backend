@@ -15,12 +15,19 @@ class CustomerResource extends JsonResource
     public function toArray($request)
     {
         return [
-            "id" => $this->id,
-            "name" => $this->name,
-            "cpf" => $this->cpf,
-            "category" => $this->category,
-            "telephone" => $this->telephone,
-            "address" => $this->address,
+            'id' => $this->id,
+
+            'name' => $this->name,
+            'cpf' => $this->cpf,
+            'category' => $this->category,
+            'telephone' => $this->telephone,
+
+            'rua' => $this->address->rua,
+            'bairro' => $this->address->bairro,
+            'cidade' => $this->address->cidade,
+            'uf' => $this->address->uf,
+            'cep' => $this->address->cep,
+            'complemento' => $this->address->complemento,
         ];
     }
 }

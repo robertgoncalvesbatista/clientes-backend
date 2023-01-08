@@ -17,13 +17,12 @@ class AddressFactory extends Factory
     public function definition()
     {
         return [
-            'rua' => "Rua Domingos Viana",
-            'bairro' => "Turf Club",
-            'cidade' => "Campos dos Goytacazes",
-            'uf' => "RJ",
-            'cep' => "28024-140",
-            'complemento' => "Escritório",
-            'id_customer' => "1",
+            'rua' => $this->faker->streetName,
+            'bairro' => $this->faker->streetAddress,
+            'cidade' => $this->faker->city,
+            'uf' => 'RJ',
+            'cep' => '28024140',
+            'complemento' => 'Escritório',
         ];
     }
 }

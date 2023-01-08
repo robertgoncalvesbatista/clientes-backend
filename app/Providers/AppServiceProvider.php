@@ -23,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        $this->app->bind('App\Repositories\Contracts\CustomerRepositoryInterface', 'App\Repositories\CustomerRepository');
+        $this->app->bind('App\Repositories\Contracts\UserRepositoryInterface', 'App\Repositories\UserRepository');
     }
 }

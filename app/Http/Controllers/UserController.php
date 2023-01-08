@@ -2,103 +2,97 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use Illuminate\Http\Request;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\UserCollection;
+use App\Http\Resources\UserResource;
+use App\Repositories\Contracts\UserRepositoryInterface;
+use Exception;
 
 class UserController extends Controller
 {
+    protected $user;
+
     /**
-     * Create the controller instance.
+     * Create the controller instance
      *
-     * @return void
+     * @param UserRepositoryInterface $user
      */
-    public function __construct()
+    public function __construct(UserRepositoryInterface $user)
     {
-        $this->authorizeResource(User::class, 'user');
+        $this->user = $user;
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\UserCollection
      */
     public function index()
     {
-        $users = User::all();
-        $data = array();
+        try {
+            $users = $this->user->getAll();
 
-        foreach ($users as $user) {
-            $customers = User::with("customers")->findOrFail($user->id);
-            array_push($data, $customers);
+            return new UserCollection($users);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
         }
-
-        return response($data, 201);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\UserStoreRequest  $request
+     * @return \App\Http\Resources\UserResource
      */
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
-        $fields = $request->validate([
-            "name" => "required|string",
-            "email" => "required|string|unique:users,email",
-            "password" => "required|string|confirmed",
-        ]);
+        try {
+            $validated = $request->validated();
 
-        $user = User::create([
-            "name" => $fields["name"],
-            "email" => $fields["email"],
-            "password" => bcrypt($fields["password"]),
-        ]);
+            $user = $this->user->create($validated);
 
-        return response($user, 201);
+            return new UserResource($user);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
+        }
     }
 
     /**
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\UserResource
      */
-    public function show($id)
+    public function show(int $id)
     {
-        // Busca o cliente pelo seu ID
-        $user = User::find($id);
+        try {
+            $user = $this->user->findById($id);
 
-        // Guarda os dados do cliente com o endereço
-        $response = User::with("customers")->findOrFail($user->id);
-
-        return response($response, 201);
+            return new UserResource($user);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\UserUpdateRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \App\Http\Resources\UserResource
      */
-    public function update(Request $request, $id)
+    public function update(UserUpdateRequest $request, int $id)
     {
-        $fields = $request->validate([
-            "name" => "required|string",
-            "email" => "required|string",
-            "password" => "required|string|confirmed",
-        ]);
+        try {
+            $validated = $request->validated();
 
-        $user = User::find($id);
+            $user = $this->user->edit($validated, $id);
 
-        $user->name = $fields["name"];
-        $user->email = $fields["email"];
-        $user->password = $fields["password"];
-
-        $user->save();
-
-        return response($user, 201);
+            return new UserResource($user);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
+        }
     }
 
     /**
@@ -107,10 +101,14 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
-        $user = User::destroy($id);
+        try {
+            $this->user->delete($id);
 
-        return response($user, 201);
+            return response()->json(['message' => 'Registro removido com sucesso!'], 400);
+        } catch (Exception $exception) {
+            return response()->json(['message' => $exception->getMessage()], 400);
+        }
     }
 }
