@@ -22,7 +22,7 @@ class UserRepository implements UserRepositoryInterface
         $response = [];
         foreach ($users as $user) {
             $customers = User::with('customers')->findOrFail($user->id);
-            array_push($data, $customers);
+            array_push($response, $customers);
         }
 
         return $response;

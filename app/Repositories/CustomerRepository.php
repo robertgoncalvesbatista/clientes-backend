@@ -79,32 +79,8 @@ class CustomerRepository implements CustomerRepositoryInterface
 
     public function edit(array $data, int $id)
     {
-        // Primeira parte da validação do CPF
-        $numbers = [];
-        for ($i = 0, $j = 10; $i < 9; $i++, $j--) {
-            $digit = $data['cpf'][$i];
-
-            array_push($numbers, $digit * $j);
-        }
-
-        $resultFirstVerification = (array_sum($numbers) * 10) % 11;
-
-        if ($resultFirstVerification != $data['cpf'][9]) {
-            throw new Exception('Este CPF não é válido!', 400);
-        }
-
-        // Segunda parte da validação do CPF
-        $numbers = [];
-        for ($i = 0, $j = 11; $i < 10; $i++, $j--) {
-            $digit = $data['cpf'][$i];
-
-            array_push($numbers, $digit * $j);
-        }
-
-        $resultSecondVerification = (array_sum($numbers) * 10) % 11;
-
-        if ($resultSecondVerification != $data['cpf'][10]) {
-            throw new Exception('Este CPF não é válido!', 400);
+        if (!HelperCPF::verify($data["cpf"])) {
+            throw new Exception('O CPF informado não é válido!', 404);
         }
 
         // Edita e salva os dados do cliente
