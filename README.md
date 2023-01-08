@@ -3,8 +3,8 @@
 ## Requisitos Funcionais
 
 -   [x] Deverá ser possível que o usuário faça login na aplicação e, caso não possua conta, realize um novo cadastro.
--   [x] Após cadastrar uma nova conta, enviar um e-mail de boas vindas. (Feito com sendinblue)
--   [ ] Após realizar login, o usuário deve ter acesso à uma listagem de clientes, contendo paginação e algum filtro ou modo de pesquisa.
+-   [x] Após cadastrar uma nova conta, enviar um e-mail de boas vindas.
+-   [x] Após realizar login, o usuário deve ter acesso à uma listagem de clientes, contendo paginação e algum filtro ou modo de pesquisa.
 -   [x] Deverá ser possível cadastrar um novo cliente, contendo os seguintes campos:
 -   -   Nome (Obrigatório);
 -   -   CPF (Obrigatório);
@@ -28,7 +28,7 @@
 -   [x] Usar o Eloquent para acesso a banco de dados.
 -   [x] Usar migrations para criação e alteração do banco de dados.
 -   [x] No frontend, usar tecnologia ou framework de sua preferência.
--   [ ] As validações devem ocorrer tanto no backend como no frontend.
+-   [x] As validações devem ocorrer tanto no backend como no frontend.
 -   [ ] Cobrir a aplicação com testes automatizados.
 -   [ ] A aplicação (backend e frontend) deverá ser hospedada na nuvem (opcional)
 

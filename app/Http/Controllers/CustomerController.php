@@ -120,4 +120,12 @@ class CustomerController extends Controller
 
         return response($customers, 201);
     }
+
+    // Busca os clientes que pertencem ao usuário logado
+    public function searchCustomer(Request $request)
+    {
+        $customers = Customer::where("name", "like", $request->search)->with("address");
+
+        return response($customers, 201);
+    }
 }
