@@ -1,0 +1,58 @@
+services:
+    #PHP Service
+    cliente-api-php:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: cliente-api-php:latest
+        container_name: cliente-api-php
+        depends_on:
+            - cliente-api-postgres
+        restart: unless-stopped
+        tty: true
+        volumes:
+            - ./:/var/www
+            - ./docker/php/config/php.ini:/etc/php/8.1/fpm/php.ini
+        networks:
+            - cliente_network
+
+    #Nginx Service
+    cliente-api-nginx:
+        image: nginx:alpine
+        container_name: cliente-api-nginx
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ./:/var/www
+            - ./docker/nginx:/etc/nginx/conf.d
+        networks:
+            - cliente_network
+
+    #PostgresSQL Service
+    cliente-api-postgres:
+        image: postgres:12.19-alpine
+        container_name: cliente-api-postgres
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: cliente-db
+            POSTGRES_PASSWORD: G8RoB66@#r
+        volumes:
+            - cliente_volume:/var/lib/postgresql/data
+        networks:
+            - cliente_network
+
+#Docker Networks
+networks:
+    cliente_network:
+        driver: bridge
+
+#Volumes
+volumes:
+    cliente_volume:
+        driver: local
