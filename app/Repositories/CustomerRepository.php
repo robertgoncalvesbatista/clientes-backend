@@ -26,9 +26,9 @@ class CustomerRepository implements CustomerRepositoryInterface
         $this->address = $address;
     }
 
-    public function getAll()
+    public function getAll(int $perPage)
     {
-        return $this->customer->all();
+        return $this->customer->paginate($perPage);
     }
 
     public function create(array $data)

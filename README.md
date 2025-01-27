@@ -43,3 +43,6 @@
 Se algum requisito não for atendido, entregar o que foi feito mesmo assim.
 Disponibilizar os fontes do projeto no GitHub.
 Deverá ser agendado uma reunião por videoconferência para apresentação da aplicação rodando localmente no seu próprio ambiente, ou em hospedagem de sua preferência. Nesta reunião a aplicação deverá ser demonstrada e explicada, bem como o código e lógica.
+
+### Config
+Port: 80

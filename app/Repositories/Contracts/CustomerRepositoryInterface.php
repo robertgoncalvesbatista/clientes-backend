@@ -9,7 +9,7 @@ interface CustomerRepositoryInterface
      *
      * @return void
      */
-    public function getAll();
+    public function getAll(int $perPage);
 
     /**
      * Cria novo cliente

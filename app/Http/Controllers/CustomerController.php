@@ -29,10 +29,10 @@ class CustomerController extends Controller
      *
      * @return \App\Http\Resources\CustomerCollection
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = $this->customer->getAll();
+            $data = $this->customer->getAll($request->query('per_page') ?? 10);
 
             return new CustomerCollection($data);
         } catch (Exception $exception) {
